@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>BLACK Ops — Dashboard</title>
+
+  <!-- ✅ Tailwind (necessário pro KM renderizar bonito) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ✅ XLSX (necessário pro KM ler Excel) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+/* =========================
+   SIDEBAR — ESTADO PADRÃO
+========================= */
+.logo-mini { display: none; }
+
+.toggle-sidebar {
+  margin: 0 auto 24px;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 20px;
+  cursor: pointer;
+}
+.toggle-sidebar:hover { color: #22d3ee; }
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* =========================
+   SIDEBAR — ESTADO RECOLHIDO
+========================= */
+.sidebar.collapsed {
+  width: 72px;
+  padding: 24px 8px;
+}
+.sidebar.collapsed .logo-full { display: none; }
+.sidebar.collapsed .logo-mini {
+  display: block;
+  margin: 0 auto 24px;
+  max-width: 40px;
+}
+.sidebar.collapsed .menu-item { justify-content: center; }
+.sidebar.collapsed .menu-item .label { display: none; }
+
+/* =========================
+   RESET / BASE
+========================= */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: #020617;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #e5e7eb;
+  display: flex;
+}
+
+/* =========================
+   LAYOUT PRINCIPAL
+========================= */
+.sidebar {
+  width: 220px;
+  background: #020617;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================
+   LOGO
+========================= */
+.sidebar .logo {
+  margin-bottom: 32px;
+  text-align: center;
+}
+.sidebar .logo img {
+  max-width: 140px;
+  width: 100%;
+}
+
+/* =========================
+   MENU LATERAL
+========================= */
+.menu { flex: 1; }
+
+.menu-item {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  text-decoration: none;
+  color: #cbd5f5;
+  border-radius: 10px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.menu-item:hover { background: rgba(34, 211, 238, 0.15); }
+.menu-item.active {
+  background: rgba(34, 211, 238, 0.25);
+  color: #22d3ee;
+}
+
+/* =========================
+   HEADER
+========================= */
+.header {
+  height: 64px;
+  min-height: 64px;        /* 🔒 trava o tamanho */
+  flex-shrink: 0;          /* 🔒 impede encolhimento no flex */
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: #020617;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+}
+.user {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* =========================
+   CONTEÚDO PRINCIPAL
+========================= */
+.main {
+  padding: 32px;
+  flex: 1;
+  background: linear-gradient(135deg, #020617, #0f172a);
+}
+
+/* =========================
+   DASHBOARD GRID
+========================= */
+.dashboard-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+.card {
+  background: #020617;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 24px;
+}
+.metric-label {
+  font-size: 12px;
+  color: #9ca3af;
+  letter-spacing: 0.12em;
+}
+.metric-value {
+  font-size: 36px;
+  font-weight: bold;
+  color: #22d3ee;
+}
+.metric-sub {
+  font-size: 14px;
+  color: #9ca3af;
+}
+.icon img {
+  width: 18px;
+  height: 18px;
+  opacity: 0.9;
+}
+.menu-item.active .icon img { opacity: 1; }
+.sidebar.collapsed .icon img {
+  width: 22px;
+  height: 22px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <img src="assets/logo-black-ops.png" class="logo-full" alt="BLACK Ops" />
+    <img src="assets/logo-black-ops-mini.png" class="logo-mini" alt="BLACK Ops" />
+  </div>
+
+  <button class="toggle-sidebar" title="Recolher menu">☰</button>
+
+  <nav class="menu">
+    <a class="menu-item active" href="#" data-route="dashboard">
+      <span class="icon"><img src="assets/icons/dashboard.png" alt="Dashboard"></span>
+      <span class="label">DASHBOARD</span>
+    </a>
+
+    <a class="menu-item" href="cotacoes.html">
+      <span class="icon"><img src="assets/icons/cotacoes.png" alt="Cotações"></span>
+      <span class="label">COTAÇÕES</span>
+    </a>
+
+    <a class="menu-item" href="#" data-route="diarias-core">
+      <span class="icon"><img src="assets/icons/diarias.png" alt="Diárias"></span>
+      <span class="label">DIÁRIAS</span>
+    </a>
+
+    <!-- ✅ KM via partial -->
+    <a class="menu-item" href="#" data-route="km-core">
+      <span class="icon"><img src="assets/icons/km.png" alt="KM"></span>
+      <span class="label">KM</span>
+    </a>
+
+    <a class="menu-item" href="relatorios.html">
+      <span class="icon"><img src="assets/icons/relatorios.png" alt="Relatórios"></span>
+      <span class="label">RELATÓRIOS</span>
+    </a>
+  </nav>
+</aside>
+
+<!-- CONTENT -->
+<div class="content">
+  <header class="header">
+    <div class="header-title" id="headerTitle">DASHBOARD</div>
+    <div class="user">USUÁRIO LOGADO</div>
+  </header>
+
+  <main class="main">
+    <div id="app-content"></div>
+  </main>
+</div>
+
+<script>
+/* =========================
+   DASHBOARD DEFAULT VIEW
+========================= */
+function renderDashboard(){
+  document.getElementById("headerTitle").textContent = "DASHBOARD";
+  const appContent = document.getElementById("app-content");
+  appContent.innerHTML = `
+    <div class="dashboard-grid">
+      <div class="card">
+        <span class="metric-label">COTAÇÕES (MÊS)</span>
+        <span class="metric-value">28</span>
+      </div>
+      <div class="card">
+        <span class="metric-label">KM & HORAS VOADAS</span>
+        <span class="metric-value">12.450 km</span>
+        <span class="metric-sub">420 horas</span>
+      </div>
+      <div class="card">
+        <span class="metric-label">CLIENTES CADASTRADOS</span>
+        <span class="metric-value">96</span>
+      </div>
+    </div>
+  `;
+}
+
+/* =========================
+   TOGGLE SIDEBAR
+========================= */
+const sidebar = document.querySelector(".sidebar");
+document.querySelector(".toggle-sidebar")
+  .addEventListener("click", () => sidebar.classList.toggle("collapsed"));
+
+/* =========================
+   SCRIPT LOADER (normal)
+========================= */
+const __loadedScripts = new Set();
+function loadScriptOnce(src){
+  return new Promise((resolve, reject) => {
+    if(__loadedScripts.has(src)) return resolve();
+
+    const s = document.createElement("script");
+    s.src = src;
+    s.async = true;
+    s.onload = () => { __loadedScripts.add(src); resolve(); };
+    s.onerror = () => reject(new Error("Falha ao carregar: " + src));
+    document.head.appendChild(s);
+  });
+}
+
+/* =========================
+   ✅ MODULE LOADER (para arquivos com import/export)
+========================= */
+const __loadedModules = new Set();
+function loadModuleOnce(src){
+  return new Promise((resolve, reject) => {
+    if(__loadedModules.has(src)) return resolve();
+
+    const s = document.createElement("script");
+    s.src = src;
+    s.type = "module";              // ✅ ESSENCIAL
+    s.async = true;
+    s.onload = () => { __loadedModules.add(src); resolve(); };
+    s.onerror = () => reject(new Error("Falha ao carregar módulo: " + src));
+    document.head.appendChild(s);
+  });
+}
+
+/* =========================
+   ROUTER (PARTIALS)
+========================= */
+async function loadRoute(route){
+  const appContent = document.getElementById("app-content");
+
+  // menu ativo
+  document.querySelectorAll(".menu-item").forEach(i => i.classList.remove("active"));
+  const active = document.querySelector(`[data-route="${route}"]`);
+  if(active) active.classList.add("active");
+
+  // recolhe menu ao abrir módulos
+  if(route !== "dashboard") sidebar.classList.add("collapsed");
+
+  if(route === "dashboard"){
+    renderDashboard();
+    return;
+  }
+
+  // título
+  document.getElementById("headerTitle").textContent =
+    (route === "km-core" ? "KM" : route.toUpperCase());
+
+  appContent.innerHTML = `<div style="padding:32px;color:#9ca3af">Carregando módulo…</div>`;
+
+  try{
+    // carrega HTML do partial
+    const res = await fetch(`partials/${route}.html`, { cache:"no-store" });
+    if(!res.ok) throw new Error("Partial não encontrado: " + route);
+    appContent.innerHTML = await res.text();
+
+    // ✅ garante que o JS do módulo executa (sem depender de <script> no partial)
+    if(route === "km-core"){
+      // KM é script "normal"
+      await loadScriptOnce("/js/km-core.js");
+      if(window.initKmCore) window.initKmCore();
+    }
+
+    if(route === "diarias-core"){
+      // ✅ DIÁRIAS tem `import`, então PRECISA ser module
+      await loadModuleOnce("/js/diarias-core.js");
+      if(window.initDiariasCore) window.initDiariasCore();
+    }
+
+  }catch(err){
+    console.error(err);
+    appContent.innerHTML = `<div style="padding:32px;color:#f87171">Erro ao carregar módulo.</div>`;
+  }
+}
+
+/* =========================
+   CLICK HANDLER
+========================= */
+document.addEventListener("click", (e) => {
+  const link = e.target.closest("[data-route]");
+  if(!link) return;
+  e.preventDefault();
+  loadRoute(link.dataset.route);
+});
+
+/* INIT */
+renderDashboard();
+</script>
+
+</body>
+</html>
