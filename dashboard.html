@@ -348,13 +348,13 @@ async function loadRoute(route){
     // ✅ garante que o JS do módulo executa (sem depender de <script> no partial)
     if(route === "km-core"){
       // KM é script "normal"
-      await loadScriptOnce("/js/km-core.js");
+      await loadScriptOnce("js/km-core.js");
       if(window.initKmCore) window.initKmCore();
     }
 
     if(route === "diarias-core"){
       // ✅ DIÁRIAS tem `import`, então PRECISA ser module
-      await loadModuleOnce("/js/diarias-core.js");
+      await loadModuleOnce("js/diarias-core.js");
       if(window.initDiariasCore) window.initDiariasCore();
     }
 
