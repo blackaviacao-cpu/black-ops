@@ -51,7 +51,7 @@ function mapHeaders(headerRow){
 ========================= */
 function extractTripulantes(headerRow){
   const trips = [];
-  for(let col = 3; col <= 8; col++){
+  for(let col = 3; col <= 10; col++){
     const v = headerRow[col];
     if(v && v.toString().trim()){
       trips.push(v.toString().trim().toUpperCase());
