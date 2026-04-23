@@ -154,7 +154,7 @@ function mealWindows(d){
 function getTripColsFromHeader(headerRow){
   const codes = [];
   const cols  = [];
-  for(let col=3; col<=8; col++){
+  for(let col=3; col<=10; col++){
     const v = (headerRow[col] || "").toString().trim();
     if(v){
       const code = v.toUpperCase();
