@@ -4,7 +4,7 @@
    Saída: array de registros (pronto p/ render do diarias-render.js)
    ========================================================= */
 
-export const VALOR_DIARIA = 72.70;
+export const VALOR_DIARIA = 76.46;
 export const BASE_CODIGO  = "SBBH";
 
 /* =========================
