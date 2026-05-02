@@ -358,7 +358,7 @@ PRINT_DATA = {
       // Tripulantes: entre D..I (3..8)
       const TRIP_CODES = [];
       const TRIP_COLS  = [];
-      for(let col=3; col<=8; col++){
+      for(let col=3; col<=10; col++){
         const v = (header[col] || "").toString().trim();
         if(v){
           TRIP_CODES.push(v);
