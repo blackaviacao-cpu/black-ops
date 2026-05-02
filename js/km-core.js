@@ -24,11 +24,11 @@ window.initKmCore = function initKmCore(){
 
   const COL_DATA       = 0;   // A
   const COL_MATRICULA  = 2;   // C
-  const COL_ORIGEM     = 10;  // K
-  const COL_DESTINO    = 11;  // L
-  const COL_DIST_KM    = 12;  // M
-  const COL_DECOL_ZULU = 14;  // O
-  const COL_POUSO_ZULU = 15;  // P
+  const COL_ORIGEM     = 12;  // K
+  const COL_DESTINO    = 13;  // L
+  const COL_DIST_KM    = 14;  // M
+  const COL_DECOL_ZULU = 16;  // O
+  const COL_POUSO_ZULU = 17;  // P
 
   const FERIADOS_JSON_URL = "/black-ops/assets/feriados.json";
 
