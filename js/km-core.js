@@ -30,7 +30,7 @@ window.initKmCore = function initKmCore(){
   const COL_DECOL_ZULU = 14;  // O
   const COL_POUSO_ZULU = 15;  // P
 
-  const FERIADOS_JSON_URL = "/assets/feriados.json";
+  const FERIADOS_JSON_URL = "/black-ops/assets/feriados.json";
 
   /* ==========================
      ELEMENTOS
