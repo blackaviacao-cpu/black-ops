@@ -147,30 +147,40 @@ if(btnPrint) btnPrint.disabled = true;
   }
 
   async function carregarFeriadosAutomatico(){
+
+  if(feriadosInfo){
     feriadosInfo.textContent = "Carregando feriados…";
-
-    try{
-      const r = await fetch(
-        FERIADOS_JSON_URL + "?v=" + Date.now(),
-        { cache:"no-store", credentials:"omit" }
-      );
-
-      if(!r.ok) throw new Error("HTTP " + r.status);
-
-      const txt = (await r.text()).replace(/^\uFEFF/, "");
-      let lista = JSON.parse(txt);
-
-      if(!Array.isArray(lista)) throw new Error("Formato inválido de feriados");
-
-      FERIADOS_SET = new Set(lista);
-      feriadosInfo.textContent = `Feriados carregados: ${FERIADOS_SET.size} data(s).`;
-
-    }catch(err){
-      console.error("✖ Erro ao carregar feriados:", err);
-      feriadosInfo.textContent = "Falha ao carregar feriados (cálculo seguirá sem feriados).";
-      FERIADOS_SET = new Set();
-    }
   }
+
+  try{
+    const r = await fetch(
+      FERIADOS_JSON_URL + "?v=" + Date.now(),
+      { cache:"no-store", credentials:"omit" }
+    );
+
+    if(!r.ok) throw new Error("HTTP " + r.status);
+
+    const txt = (await r.text()).replace(/^\uFEFF/, "");
+    let lista = JSON.parse(txt);
+
+    if(!Array.isArray(lista)) throw new Error("Formato inválido de feriados");
+
+    FERIADOS_SET = new Set(lista);
+
+    if(feriadosInfo){
+      feriadosInfo.textContent = `Feriados carregados: ${FERIADOS_SET.size} data(s).`;
+    }
+
+  }catch(err){
+    console.error("✖ Erro ao carregar feriados:", err);
+
+    if(feriadosInfo){
+      feriadosInfo.textContent = "Falha ao carregar feriados (cálculo seguirá sem feriados).";
+    }
+
+    FERIADOS_SET = new Set();
+  }
+}
 
   /* ==========================
      MOTOR DE TARIFA
