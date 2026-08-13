@@ -1,0 +1,212 @@
+<!--
+KM-CORE — PARTIAL (LAYOUT ORIGINAL RESTAURADO)
+- sem html/head/body
+- JS é carregado pelo dashboard (loadScriptOnce) e initKmCore()
+-->
+
+<style>
+  :root{
+    --card-bg:#0b1220;
+    --accent:#38bdf8;
+    --accent-soft:rgba(56,189,248,.12);
+    --border-subtle:rgba(148,163,184,.25);
+    --text-primary:#e5e7eb;
+    --text-muted:#9ca3af;
+  }
+
+  /* Wrapper do módulo dentro do main do dashboard */
+  #blaq-km{
+    width:100%;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:2.5rem 1rem;
+  }
+
+  .card{
+    width:100%;
+    max-width:1200px;
+    background:radial-gradient(circle at top left, rgba(56,189,248,.12), transparent 55%), var(--card-bg);
+    border-radius:1.5rem;
+    border:1px solid var(--border-subtle);
+    box-shadow:0 24px 60px rgba(15,23,42,.8);
+    padding:1.75rem 1.75rem 2rem;
+  }
+
+  .tbl th,
+  .tbl td{
+    white-space:nowrap;
+    padding:.35rem .55rem;
+    font-size:.75rem;
+  }
+  .tbl thead th{
+    position:sticky;
+    top:0;
+    background:rgba(15,23,42,.98);
+    backdrop-filter:blur(6px);
+    z-index:5;
+  }
+
+  .badge-chip{
+    padding:.1rem .45rem;
+    border-radius:999px;
+    font-size:.68rem;
+    border:1px solid rgba(148,163,184,.35);
+    background:rgba(15,23,42,.9);
+    color:#e5e7eb;
+  }
+
+  .bg-rose-900\/40{ animation:pulse 1.5s infinite; }
+  @keyframes pulse{
+    0%{opacity:1} 50%{opacity:.6} 100%{opacity:1}
+  }
+</style>
+
+<div id="blaq-km">
+  <div class="card">
+
+    <!-- HEADER BLACK PADRÃO -->
+    <header class="flex items-center justify-between mb-8 pb-4 border-b border-slate-700/50">
+      <div class="flex items-center gap-4">
+        <div class="flex flex-col">
+          <h1 class="text-xl sm:text-2xl font-semibold text-slate-100 tracking-tight">
+            Remuneração por KM Voado
+          </h1>
+          <span class="text-xs text-slate-400">
+            Módulo — cálculo proporcional por faixas horárias
+          </span>
+        </div>
+      </div>
+
+<div class="flex items-center gap-2">
+  <button id="btnPrint" type="button"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl
+                 border border-slate-300/40 text-slate-200 hover:bg-slate-700/40 transition text-sm
+                 disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled>
+    🖨️ Imprimir
+  </button>
+</div>
+
+    </header>
+
+    <!-- ÁREA DE UPLOADS -->
+    <div class="border border-slate-700/60 rounded-2xl bg-slate-900/60 p-4 mb-4">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+
+        <!-- PLANILHA DE VOOS -->
+        <div class="space-y-2">
+          <label class="block text-xs font-medium text-slate-300 mb-1">
+            1. Selecione a planilha de voos (.xlsm)
+          </label>
+          <input id="fileVoos" type="file"
+                 accept=".xlsx,.xlsm,.xls"
+                 class="block w-full text-xs text-slate-200
+                        file:mr-3 file:py-1.5 file:px-3 file:rounded-full
+                        file:border-0 file:text-xs file:font-medium
+                        file:bg-sky-600 file:text-white
+                        hover:file:bg-sky-500 cursor-pointer
+                        bg-slate-900/80 border border-slate-700/70 rounded-xl px-2 py-1"/>
+          <p class="text-[0.7rem] text-slate-500">
+            Mesmo arquivo do módulo de diárias, com abas mensais JANEIRO…DEZEMBRO.
+          </p>
+        </div>
+
+        <!-- FERIADOS (AUTOLOAD) -->
+        <div class="space-y-2">
+          <div class="text-xs font-medium text-slate-300">2. Feriados</div>
+          <div id="feriadosInfo" class="text-[0.75rem] text-emerald-300">
+            Carregando feriados…
+          </div>
+          <div class="text-[0.7rem] text-slate-500">
+            Domingo/feriado = 0,90 o dia inteiro.
+          </div>
+        </div>
+
+        <!-- SELETOR DE ABA + BOTÃO -->
+        <div class="space-y-3">
+          <div class="space-y-1">
+            <div class="flex items-center justify-between gap-2">
+              <span class="block text-xs font-medium text-slate-300">
+                3. Escolha o mês (aba)
+              </span>
+              <span id="sheetInfo" class="text-[0.65rem] text-slate-500"></span>
+            </div>
+            <div id="sheetPicker" class="flex flex-wrap gap-1.5"></div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <button id="btnProcessar" type="button"
+                    class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold
+                           bg-sky-600/90 hover:bg-sky-500 text-white shadow shadow-sky-800/60
+                           disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+                    disabled>
+              <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-300"></span>
+              Processar remuneração
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STATUS -->
+    <div id="statusBox" class="text-xs text-slate-400 mb-3">
+      Selecione a planilha de voos para começar.
+    </div>
+
+    <!-- TOTAIS -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
+      <div class="border border-slate-700/60 rounded-2xl bg-slate-900/60 p-3">
+        <div class="text-xs text-slate-300 font-semibold mb-2">Totais por Tripulante (100% do voo)</div>
+        <div id="totaisTrip" class="flex flex-wrap gap-2 text-xs text-slate-200"></div>
+      </div>
+
+      <div class="border border-slate-700/60 rounded-2xl bg-slate-900/60 p-3">
+        <div class="text-xs text-slate-300 font-semibold mb-2">Totais por Matrícula / Tripulante</div>
+        <div id="totaisMat" class="text-xs text-slate-200 space-y-2"></div>
+      </div>
+    </div>
+
+    <!-- TABELA -->
+    <div class="border border-slate-700/60 rounded-2xl bg-slate-950/70 overflow-hidden">
+      <div class="flex items-center justify-between px-3 py-2 border-b border-slate-800/80 bg-slate-950/80">
+        <div class="flex items-center gap-2 text-[0.75rem] text-slate-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+          Resultado por trecho (horário local) — KM 0,30 / 0,60 / 0,90
+        </div>
+        <span class="text-[0.7rem] text-slate-500">
+          0,30 = 06–18 · 0,60 = 18–06 · 0,90 = domingo/feriado
+        </span>
+      </div>
+
+      <div class="max-h-[520px] overflow-auto space-y-4">
+        <table class="min-w-full text-left text-xs text-slate-200 tbl">
+          <thead class="border-b border-slate-800 text-[0.7rem] uppercase tracking-wide text-slate-400" id="theadKm">
+            <tr>
+              <th class="px-3 py-2">Data</th>
+              <th class="px-3 py-2">Origem</th>
+              <th class="px-3 py-2">Destino</th>
+              <th class="px-3 py-2 text-right">KM</th>
+              <th class="px-3 py-2 text-right">KM 0,30</th>
+              <th class="px-3 py-2 text-right">KM 0,60</th>
+              <th class="px-3 py-2 text-right">KM 0,90</th>
+              <th class="px-3 py-2 text-right">R$ 0,30</th>
+              <th class="px-3 py-2 text-right">R$ 0,60</th>
+              <th class="px-3 py-2 text-right">R$ 0,90</th>
+              <th class="px-3 py-2 text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyVoos" class="divide-y divide-slate-800/80">
+            <tr>
+              <td colspan="11" class="px-3 py-6 text-center text-xs text-slate-400">
+                Aguardando arquivo e seleção de mês…
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
